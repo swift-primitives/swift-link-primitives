@@ -27,11 +27,6 @@ jobs:
   docs:
     uses: swift-institute/.github/.github/workflows/swift-docs.yml@main
     with:
-      umbrella-module: Link_Primitives
-      umbrella-display-name: "Link Primitives"
-      umbrella-bundle-id: "swift-link-primitives.Link-Primitives"
-      umbrella-docc-path: "Sources/Link Primitives/Link Primitives.docc"
-      exclude-modules: "Link_Primitives_Test_Support"
       enable-private-repos: true
     secrets:
       PRIVATE_REPO_TOKEN: ${{ secrets.PRIVATE_REPO_TOKEN }}

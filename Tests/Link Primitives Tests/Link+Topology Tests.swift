@@ -44,7 +44,7 @@ private final class Pool {
     }
 
     func linksAt(_ index: Index<N>) -> UnsafeMutablePointer<InlineArray<2, Index<N>>> {
-        unsafe Link<2>.linksPointer(in: base + Int(bitPattern: index.position.rawValue))
+        unsafe Link<2>.linksPointer(in: base + Index<N>.Offset(fromZero: index))
     }
 
     func element(at rawIndex: UInt) -> Int {

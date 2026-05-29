@@ -22,8 +22,8 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(path: "../swift-index-primitives"),
-        .package(path: "../swift-vector-primitives"),
+        .package(url: "https://github.com/swift-primitives/swift-index-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-vector-primitives.git", branch: "main"),
     ],
     targets: [
         .target(

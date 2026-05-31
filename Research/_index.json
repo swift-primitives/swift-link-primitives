@@ -5,17 +5,5 @@
   "title": "Research Index",
   "blurb": "",
   "scope": "swift-link-primitives (swift-primitives)",
-  "documents": [
-    {
-      "file": "audit.md",
-      "displayName": "audit.md",
-      "topic": "Systematic code audit against skill requirements",
-      "date": "2026-04-01",
-      "status": "CLEAN",
-      "statusDetail": null,
-      "statusRaw": "CLEAN",
-      "tier": null,
-      "scope": null
-    }
-  ]
+  "documents": []
 }

@@ -24,30 +24,35 @@ extension Link {
     /// This method only manipulates prev/next indices and the header —
     /// it does not allocate, initialize, or touch element storage.
     ///
+    /// Link access is pointer-free: `getLink` reads a node's link slot and
+    /// `setLink` writes one. A consumer backs them with its storage's typed
+    /// subscript (e.g. `storage[index].links[slot]`), never a raw pointer.
+    ///
     /// - Parameters:
     ///   - index: The node to link as the new tail.
     ///   - header: The list's cursor state.
-    ///   - linksAt: Closure providing mutable access to the links array at a given index.
+    ///   - getLink: Reads the link at `(index, slot)`.
+    ///   - setLink: Writes `value` to the link at `(index, slot)`.
     @inlinable
-    @unsafe
     public static func append<Tag: ~Copyable & ~Escapable>(
         _ index: Index<Tag>,
         header: inout Header<Tag>,
-        _ linksAt: (Index<Tag>) -> UnsafeMutablePointer<InlineArray<N, Index<Tag>>>
+        getLink: (Index<Tag>, Int) -> Index<Tag>,
+        setLink: (Index<Tag>, Int, Index<Tag>) -> Void
     ) {
         let sentinel = header.sentinel
 
         if header.tail != sentinel {
-            unsafe linksAt(header.tail).pointee[0] = index
+            setLink(header.tail, 0, index)
             if N >= 2 {
-                unsafe linksAt(index).pointee[1] = header.tail
+                setLink(index, 1, header.tail)
             }
         } else {
             header.head = index
         }
 
         header.tail = index
-        unsafe linksAt(index).pointee[0] = sentinel
+        setLink(index, 0, sentinel)
         header.count += .one
     }
 
@@ -57,26 +62,26 @@ extension Link {
     ///
     /// The node's links MUST be initialized to sentinel before calling.
     @inlinable
-    @unsafe
     public static func prepend<Tag: ~Copyable & ~Escapable>(
         _ index: Index<Tag>,
         header: inout Header<Tag>,
-        _ linksAt: (Index<Tag>) -> UnsafeMutablePointer<InlineArray<N, Index<Tag>>>
+        getLink: (Index<Tag>, Int) -> Index<Tag>,
+        setLink: (Index<Tag>, Int, Index<Tag>) -> Void
     ) {
         let sentinel = header.sentinel
 
         if header.head != sentinel {
-            unsafe linksAt(index).pointee[0] = header.head
+            setLink(index, 0, header.head)
             if N >= 2 {
-                unsafe linksAt(header.head).pointee[1] = index
+                setLink(header.head, 1, index)
             }
         } else {
             header.tail = index
-            unsafe linksAt(index).pointee[0] = sentinel
+            setLink(index, 0, sentinel)
         }
 
         if N >= 2 {
-            unsafe linksAt(index).pointee[1] = sentinel
+            setLink(index, 1, sentinel)
         }
 
         header.head = index
@@ -94,31 +99,30 @@ extension Link {
     /// - Precondition: N >= 2 (doubly-linked). Singly-linked arbitrary
     ///   removal requires O(n) traversal and is not supported.
     @inlinable
-    @unsafe
     public static func unlink<Tag: ~Copyable & ~Escapable>(
         _ index: Index<Tag>,
         header: inout Header<Tag>,
-        _ linksAt: (Index<Tag>) -> UnsafeMutablePointer<InlineArray<N, Index<Tag>>>
+        getLink: (Index<Tag>, Int) -> Index<Tag>,
+        setLink: (Index<Tag>, Int, Index<Tag>) -> Void
     ) {
         let sentinel = header.sentinel
-        let linksPtr = unsafe linksAt(index)
-        let prevIndex = unsafe linksPtr.pointee[1]
-        let nextIndex = unsafe linksPtr.pointee[0]
+        let prevIndex = getLink(index, 1)
+        let nextIndex = getLink(index, 0)
 
         if prevIndex != sentinel {
-            unsafe linksAt(prevIndex).pointee[0] = nextIndex
+            setLink(prevIndex, 0, nextIndex)
         } else {
             header.head = nextIndex
         }
 
         if nextIndex != sentinel {
-            unsafe linksAt(nextIndex).pointee[1] = prevIndex
+            setLink(nextIndex, 1, prevIndex)
         } else {
             header.tail = prevIndex
         }
 
-        unsafe linksPtr.pointee[0] = sentinel
-        unsafe linksPtr.pointee[1] = sentinel
+        setLink(index, 0, sentinel)
+        setLink(index, 1, sentinel)
 
         header.count = header.count.subtract.saturating(.one)
     }
@@ -130,29 +134,29 @@ extension Link {
     /// Returns `nil` if the list is empty.
     /// After unlinking, the node's link slots are set to sentinel.
     @inlinable
-    @unsafe
     public static func unlinkFirst<Tag: ~Copyable & ~Escapable>(
         header: inout Header<Tag>,
-        _ linksAt: (Index<Tag>) -> UnsafeMutablePointer<InlineArray<N, Index<Tag>>>
+        getLink: (Index<Tag>, Int) -> Index<Tag>,
+        setLink: (Index<Tag>, Int, Index<Tag>) -> Void
     ) -> Index<Tag>? {
         let sentinel = header.sentinel
         guard header.head != sentinel else { return nil }
 
         let slot = header.head
-        let nextSlot = unsafe linksAt(slot).pointee[0]
+        let nextSlot = getLink(slot, 0)
 
         header.head = nextSlot
         if nextSlot != sentinel {
             if N >= 2 {
-                unsafe linksAt(nextSlot).pointee[1] = sentinel
+                setLink(nextSlot, 1, sentinel)
             }
         } else {
             header.tail = sentinel
         }
 
-        unsafe linksAt(slot).pointee[0] = sentinel
+        setLink(slot, 0, sentinel)
         if N >= 2 {
-            unsafe linksAt(slot).pointee[1] = sentinel
+            setLink(slot, 1, sentinel)
         }
 
         header.count = header.count.subtract.saturating(.one)
@@ -166,10 +170,10 @@ extension Link {
     /// O(1) for N >= 2 (doubly-linked). O(n) for N == 1 (traverses from head).
     /// Returns `nil` if the list is empty.
     @inlinable
-    @unsafe
     public static func unlinkLast<Tag: ~Copyable & ~Escapable>(
         header: inout Header<Tag>,
-        _ linksAt: (Index<Tag>) -> UnsafeMutablePointer<InlineArray<N, Index<Tag>>>
+        getLink: (Index<Tag>, Int) -> Index<Tag>,
+        setLink: (Index<Tag>, Int, Index<Tag>) -> Void
     ) -> Index<Tag>? {
         let sentinel = header.sentinel
         guard header.tail != sentinel else { return nil }
@@ -177,24 +181,24 @@ extension Link {
         let slot = header.tail
 
         if N >= 2 {
-            let prevSlot = unsafe linksAt(slot).pointee[1]
+            let prevSlot = getLink(slot, 1)
 
             header.tail = prevSlot
             if prevSlot != sentinel {
-                unsafe linksAt(prevSlot).pointee[0] = sentinel
+                setLink(prevSlot, 0, sentinel)
             } else {
                 header.head = sentinel
             }
 
-            unsafe linksAt(slot).pointee[0] = sentinel
-            unsafe linksAt(slot).pointee[1] = sentinel
+            setLink(slot, 0, sentinel)
+            setLink(slot, 1, sentinel)
         } else {
             // O(n) singly-linked: traverse from head to find predecessor.
             var prevSlot = sentinel
             if header.head != slot {
                 var current = header.head
                 while current != sentinel {
-                    let nextSlot = unsafe linksAt(current).pointee[0]
+                    let nextSlot = getLink(current, 0)
                     if nextSlot == slot {
                         prevSlot = current
                         break
@@ -205,12 +209,12 @@ extension Link {
 
             header.tail = prevSlot
             if prevSlot != sentinel {
-                unsafe linksAt(prevSlot).pointee[0] = sentinel
+                setLink(prevSlot, 0, sentinel)
             } else {
                 header.head = sentinel
             }
 
-            unsafe linksAt(slot).pointee[0] = sentinel
+            setLink(slot, 0, sentinel)
         }
 
         header.count = header.count.subtract.saturating(.one)
@@ -225,24 +229,24 @@ extension Link {
     ///
     /// - Precondition: `position` is a valid node in this list.
     @inlinable
-    @unsafe
     public static func insert<Tag: ~Copyable & ~Escapable>(
         _ index: Index<Tag>,
         after position: Index<Tag>,
         header: inout Header<Tag>,
-        _ linksAt: (Index<Tag>) -> UnsafeMutablePointer<InlineArray<N, Index<Tag>>>
+        getLink: (Index<Tag>, Int) -> Index<Tag>,
+        setLink: (Index<Tag>, Int, Index<Tag>) -> Void
     ) {
         let sentinel = header.sentinel
-        let nextSlot = unsafe linksAt(position).pointee[0]
+        let nextSlot = getLink(position, 0)
 
         // Link new node between position and its successor.
-        unsafe linksAt(position).pointee[0] = index
-        unsafe linksAt(index).pointee[0] = nextSlot
+        setLink(position, 0, index)
+        setLink(index, 0, nextSlot)
 
         if N >= 2 {
-            unsafe linksAt(index).pointee[1] = position
+            setLink(index, 1, position)
             if nextSlot != sentinel {
-                unsafe linksAt(nextSlot).pointee[1] = index
+                setLink(nextSlot, 1, index)
             }
         }
 
@@ -260,16 +264,15 @@ extension Link {
     /// The body receives the index of each node. The caller uses the
     /// index to access the element via their own storage.
     @inlinable
-    @unsafe
     public static func forEach<Tag: ~Copyable & ~Escapable>(
         header: Header<Tag>,
-        _ linksAt: (Index<Tag>) -> UnsafeMutablePointer<InlineArray<N, Index<Tag>>>,
+        getLink: (Index<Tag>, Int) -> Index<Tag>,
         _ body: (Index<Tag>) -> Void
     ) {
         let sentinel = header.sentinel
         var current = header.head
         while current != sentinel {
-            let nextSlot = unsafe linksAt(current).pointee[0]
+            let nextSlot = getLink(current, 0)
             body(current)
             current = nextSlot
         }

@@ -23,10 +23,10 @@ extension Link {
     ///
     /// ## Links-First Layout
     ///
-    /// Links are the first field so that `Link.linksPointer(in:)` can
-    /// return the node pointer directly as a links pointer (offset 0).
-    /// This enables Element-free topology operations — the `linksAt`
-    /// closure needs no offset computation.
+    /// Links are the first field so that a links view sits at offset 0,
+    /// independent of `Element`. Topology operations are element-free —
+    /// they read and write link slots through the `getLink` / `setLink`
+    /// accessors, never touching element storage.
     ///
     /// `@frozen` because cross-module partial consumption of ~Copyable
     /// types requires known layout.
@@ -44,27 +44,6 @@ extension Link {
             self.links = links
             self.element = element
         }
-    }
-}
-
-// MARK: - Links Pointer
-
-extension Link {
-
-    /// Returns a mutable pointer to the links array within the given node.
-    ///
-    /// Because `Node` is `@frozen` with `links` as the first field,
-    /// the node pointer IS the links pointer at offset 0.
-    /// This is zero-cost — no offset computation needed.
-    ///
-    /// - Parameter nodePointer: A mutable pointer to a node in the pool.
-    /// - Returns: A mutable pointer to the node's links array.
-    @inlinable @unsafe
-    public static func linksPointer<Element: ~Copyable>(
-        in nodePointer: UnsafeMutablePointer<Node<Element>>
-    ) -> UnsafeMutablePointer<InlineArray<N, Index<Node<Element>>>> {
-        unsafe UnsafeMutableRawPointer(nodePointer)
-            .assumingMemoryBound(to: InlineArray<N, Index<Node<Element>>>.self)
     }
 }
 

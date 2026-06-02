@@ -21,7 +21,7 @@ extension Link {
     /// Generic over a phantom `Tag` for index type safety. The tag is
     /// typically `Link<N>.Node<Element>`, but can be any type — the
     /// header never inspects or constrains the tag beyond phantom use.
-    public struct Header<Tag: ~Copyable>: Copyable, Sendable {
+    public struct Header<Tag: ~Copyable & ~Escapable>: Copyable, Sendable {
         /// Index of the first node. Sentinel = empty list.
         public var head: Index<Tag>
 

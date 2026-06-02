@@ -30,7 +30,7 @@ extension Link {
     ///   - linksAt: Closure providing mutable access to the links array at a given index.
     @inlinable
     @unsafe
-    public static func append<Tag: ~Copyable>(
+    public static func append<Tag: ~Copyable & ~Escapable>(
         _ index: Index<Tag>,
         header: inout Header<Tag>,
         _ linksAt: (Index<Tag>) -> UnsafeMutablePointer<InlineArray<N, Index<Tag>>>
@@ -58,7 +58,7 @@ extension Link {
     /// The node's links MUST be initialized to sentinel before calling.
     @inlinable
     @unsafe
-    public static func prepend<Tag: ~Copyable>(
+    public static func prepend<Tag: ~Copyable & ~Escapable>(
         _ index: Index<Tag>,
         header: inout Header<Tag>,
         _ linksAt: (Index<Tag>) -> UnsafeMutablePointer<InlineArray<N, Index<Tag>>>
@@ -95,7 +95,7 @@ extension Link {
     ///   removal requires O(n) traversal and is not supported.
     @inlinable
     @unsafe
-    public static func unlink<Tag: ~Copyable>(
+    public static func unlink<Tag: ~Copyable & ~Escapable>(
         _ index: Index<Tag>,
         header: inout Header<Tag>,
         _ linksAt: (Index<Tag>) -> UnsafeMutablePointer<InlineArray<N, Index<Tag>>>
@@ -131,7 +131,7 @@ extension Link {
     /// After unlinking, the node's link slots are set to sentinel.
     @inlinable
     @unsafe
-    public static func unlinkFirst<Tag: ~Copyable>(
+    public static func unlinkFirst<Tag: ~Copyable & ~Escapable>(
         header: inout Header<Tag>,
         _ linksAt: (Index<Tag>) -> UnsafeMutablePointer<InlineArray<N, Index<Tag>>>
     ) -> Index<Tag>? {
@@ -167,7 +167,7 @@ extension Link {
     /// Returns `nil` if the list is empty.
     @inlinable
     @unsafe
-    public static func unlinkLast<Tag: ~Copyable>(
+    public static func unlinkLast<Tag: ~Copyable & ~Escapable>(
         header: inout Header<Tag>,
         _ linksAt: (Index<Tag>) -> UnsafeMutablePointer<InlineArray<N, Index<Tag>>>
     ) -> Index<Tag>? {
@@ -226,7 +226,7 @@ extension Link {
     /// - Precondition: `position` is a valid node in this list.
     @inlinable
     @unsafe
-    public static func insert<Tag: ~Copyable>(
+    public static func insert<Tag: ~Copyable & ~Escapable>(
         _ index: Index<Tag>,
         after position: Index<Tag>,
         header: inout Header<Tag>,
@@ -261,7 +261,7 @@ extension Link {
     /// index to access the element via their own storage.
     @inlinable
     @unsafe
-    public static func forEach<Tag: ~Copyable>(
+    public static func forEach<Tag: ~Copyable & ~Escapable>(
         header: Header<Tag>,
         _ linksAt: (Index<Tag>) -> UnsafeMutablePointer<InlineArray<N, Index<Tag>>>,
         _ body: (Index<Tag>) -> Void

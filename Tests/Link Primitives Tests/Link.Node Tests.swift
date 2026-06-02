@@ -58,22 +58,6 @@ extension `Link Node Tests`.Unit {
     }
 
     @Test
-    func `linksPointer returns offset zero`() {
-        let sentinel: Index<Link<2>.Node<Int>> = 99
-        let links = InlineArray<2, Index<Link<2>.Node<Int>>>(repeating: sentinel)
-        var node = Link<2>.Node(links: links, element: 42)
-
-        unsafe withUnsafeMutablePointer(to: &node) { nodePtr in
-            let linksPtr = unsafe Link<2>.linksPointer(in: nodePtr)
-
-            // Pointer identity: node pointer == links pointer (offset 0)
-            let nodeRaw = unsafe UnsafeRawPointer(nodePtr)
-            let linksRaw = unsafe UnsafeRawPointer(linksPtr)
-            #expect(nodeRaw == linksRaw)
-        }
-    }
-
-    @Test
     func `singly linked node`() {
         let sentinel: Index<Link<1>.Node<Int>> = 99
         let links = InlineArray<1, Index<Link<1>.Node<Int>>>(repeating: sentinel)

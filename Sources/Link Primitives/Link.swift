@@ -13,7 +13,7 @@
 ///
 /// Provides O(1) linked-list operations parametric over node access.
 /// Does not allocate, deallocate, or touch elements — only manages
-/// prev/next indices via the `linksAt` closure.
+/// prev/next indices through pointer-free `getLink` / `setLink` accessors.
 ///
 /// ## Design
 ///

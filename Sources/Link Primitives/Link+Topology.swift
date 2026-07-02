@@ -18,7 +18,9 @@ extension Link {
 
     // MARK: Append
 
-    /// Links `index` as the new tail of the list. O(1).
+    /// Links `index` as the new tail of the list.
+    ///
+    /// O(1).
     ///
     /// The node's links MUST be initialized to sentinel before calling.
     /// This method only manipulates prev/next indices and the header —
@@ -58,7 +60,9 @@ extension Link {
 
     // MARK: Prepend
 
-    /// Links `index` as the new head of the list. O(1).
+    /// Links `index` as the new head of the list.
+    ///
+    /// O(1).
     ///
     /// The node's links MUST be initialized to sentinel before calling.
     @inlinable
@@ -90,7 +94,9 @@ extension Link {
 
     // MARK: Unlink
 
-    /// Unlinks `index` from the list. O(1) for N >= 2.
+    /// Unlinks `index` from the list.
+    ///
+    /// O(1) for N >= 2.
     ///
     /// After unlinking, the node's link slots are set to sentinel.
     /// The caller is responsible for extracting the element and
@@ -129,7 +135,9 @@ extension Link {
 
     // MARK: Unlink First
 
-    /// Unlinks the head node and returns its index. O(1).
+    /// Unlinks the head node and returns its index.
+    ///
+    /// O(1).
     ///
     /// Returns `nil` if the list is empty.
     /// After unlinking, the node's link slots are set to sentinel.
@@ -223,7 +231,9 @@ extension Link {
 
     // MARK: Insert
 
-    /// Links `index` immediately after `position` in the list. O(1).
+    /// Links `index` immediately after `position` in the list.
+    ///
+    /// O(1).
     ///
     /// The node's links MUST be initialized to sentinel before calling.
     ///
@@ -259,7 +269,9 @@ extension Link {
 
     // MARK: For Each
 
-    /// Visits each node index from head to tail. O(n).
+    /// Visits each node index from head to tail.
+    ///
+    /// O(n).
     ///
     /// The body receives the index of each node. The caller uses the
     /// index to access the element via their own storage.

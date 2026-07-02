@@ -22,16 +22,22 @@ extension Link {
     /// typically `Link<N>.Node<Element>`, but can be any type — the
     /// header never inspects or constrains the tag beyond phantom use.
     public struct Header<Tag: ~Copyable & ~Escapable>: Copyable, Sendable {
-        /// Index of the first node. Sentinel = empty list.
+        /// Index of the first node.
+        ///
+        /// Sentinel = empty list.
         public var head: Index<Tag>
 
-        /// Index of the last node. Sentinel = empty list.
+        /// Index of the last node.
+        ///
+        /// Sentinel = empty list.
         public var tail: Index<Tag>
 
         /// Number of elements in the list.
         public var count: Index<Tag>.Count
 
-        /// Sentinel value (pool capacity as ordinal). Marks end-of-list.
+        /// Sentinel value (pool capacity as ordinal).
+        ///
+        /// Marks end-of-list.
         public let sentinel: Index<Tag>
 
         /// Creates a header for an empty list with the given sentinel.

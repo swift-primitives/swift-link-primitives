@@ -32,7 +32,9 @@ extension Link {
     /// types requires known layout.
     @frozen
     public struct Node<Element: ~Copyable>: ~Copyable {
-        /// Links to other nodes. `links[0]` = next, `links[1]` = prev (N >= 2).
+        /// Links to other nodes.
+        ///
+        /// `links[0]` = next, `links[1]` = prev (N >= 2).
         public var links: InlineArray<N, Index<Node>>
 
         /// The element value stored in this node.

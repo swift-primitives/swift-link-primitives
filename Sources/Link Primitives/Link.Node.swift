@@ -42,6 +42,7 @@ extension Link {
 
         /// Creates a node with the given links and element.
         @inlinable
+        // swiftlint:disable:next prefer_self_in_static_references - reason: deliberate phantom-tag idiom — links ARE `Index<Node>` values (see type doc above); the tag names the concept, so `Self` would obscure what the index indexes
         public init(links: InlineArray<N, Index<Node>>, element: consuming Element) {
             self.links = links
             self.element = element

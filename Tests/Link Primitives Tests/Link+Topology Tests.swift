@@ -24,12 +24,8 @@ import Testing
 /// its own buffer.
 @safe
 private final class Pool {
-    typealias N = Link<2>.Node<Int>
-
     let base: UnsafeMutablePointer<N>
     let capacity: UInt
-
-    var sentinel: Index<N> { Index(_unchecked: Ordinal(capacity)) }
 
     init(capacity: UInt) {
         self.capacity = capacity
@@ -39,6 +35,12 @@ private final class Pool {
     deinit {
         unsafe base.deallocate()
     }
+}
+
+extension Pool {
+    typealias N = Link<2>.Node<Int>
+
+    var sentinel: Index<N> { Index(_unchecked: Ordinal(capacity)) }
 
     func initializeNode(at rawIndex: UInt, element: Int) {
         let s = sentinel
